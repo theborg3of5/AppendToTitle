@@ -1,0 +1,2 @@
+Remove constants stuff if not needed.
+Sanitize stuff going into execScript somehow?

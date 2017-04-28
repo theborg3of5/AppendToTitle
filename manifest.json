@@ -1,0 +1,19 @@
+﻿{
+	"name": "Append to Title",
+	"version": "0.1",
+	"description": "Append specific, configurable strings to the title of the tab based on the URL.",
+	"manifest_version": 2,
+	"permissions": [
+		"tabs",
+		"storage",
+		"<all_urls>"
+	],
+//	"icons": {
+//		"128": "icon128.png"
+//	},
+	"background": {
+		"page": "background.html"
+	},
+	"incognito": "split",
+	"options_page": "options.html"
+}
