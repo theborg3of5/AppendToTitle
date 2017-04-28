@@ -1,5 +1,4 @@
 ﻿
-var ATT_Settings = "ATT_Settings"; // ATT -> AppendToTitle
 var LocalSettings = [];
 
 
