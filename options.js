@@ -6,7 +6,9 @@ function loadOptions() {
 		],
 		function(items) {
 			var settings = items[ATT_Settings];
-			buildSettingsTable(settings):
+			buildSettingsTable(settings);
+			
+			alert(settings["stackoverflow.com"]);
 		}
 	);
 }
@@ -38,9 +40,11 @@ function saveOptions() {
 	);
 }
 function parseSettingsTable() {
-	var settings = [];
+	var settings = {};
 	var domain;
 	var stringToAppend;
+	
+	settings["stackoverflow.com"] = " - Website!";
 	
 	// Loop over all rows in table and grab the domain / string combos.
 	// For ... in ...
@@ -55,22 +59,22 @@ function parseSettingsTable() {
 
 
 
-function updateCustomWarningEvent(e) {
-	updateCustomWarning(e.target.value);
-}
-function updateCustomWarning(pinnedTabPage) {
-	if(pinnedTabPage == PinnedTabPage_Custom)
-		document.getElementById("customWarning").style.display = "inline";
-	else
-		document.getElementById("customWarning").style.display = "none";
-}
+// function updateCustomWarningEvent(e) {
+	// updateCustomWarning(e.target.value);
+// }
+// function updateCustomWarning(pinnedTabPage) {
+	// if(pinnedTabPage == PinnedTabPage_Custom)
+		// document.getElementById("customWarning").style.display = "inline";
+	// else
+		// document.getElementById("customWarning").style.display = "none";
+// }
 
 
 // Add the events to load/save from this page.
 document.addEventListener("DOMContentLoaded", loadOptions);
 document.querySelector("#save").addEventListener("click", saveOptions);
 
-// Update whether custom warning is shown when different page options are selected.
-var pinnedTabPageInputs = document.querySelectorAll(".PinnedTabPage")
-for(var i = 0; i < pinnedTabPageInputs.length; i++)
-	pinnedTabPageInputs[i].addEventListener("change", updateCustomWarningEvent);
+// // Update whether custom warning is shown when different page options are selected.
+// var pinnedTabPageInputs = document.querySelectorAll(".PinnedTabPage")
+// for(var i = 0; i < pinnedTabPageInputs.length; i++)
+	// pinnedTabPageInputs[i].addEventListener("change", updateCustomWarningEvent);

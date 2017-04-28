@@ -2,3 +2,4 @@ Remove constants stuff if not needed.
 Sanitize stuff going into execScript somehow?
 Find icon to use, plug it in.
 	Add mention of where it comes from to readme as well.
+Deal with error about access to domains on chrome:// URLs?

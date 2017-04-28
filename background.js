@@ -8,10 +8,7 @@ function startup() {
 			ATT_Settings
 		],
 		function(items) {
-			// LocalSettings = items[ATT_Settings];
-			LocalSettings = {
-				"stackoverflow.com": " - Website!"
-			};
+			LocalSettings = items[ATT_Settings];
 		}
 	);
 }
