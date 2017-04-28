@@ -1,8 +1,21 @@
 ﻿
+var ATT_Settings = "ATT_Settings"; // ATT -> AppendToTitle
+var LocalSettings = [];
 
 
-
-
+function startup() {
+	chrome.storage.sync.get(
+		[
+			ATT_Settings
+		],
+		function(items) {
+			// LocalSettings = items[ATT_Settings];
+			LocalSettings = {
+				"stackoverflow.com": " - Website!"
+			};
+		}
+	);
+}
 
 function tabUpdated(tabId, changeInfo, tab) {
 	if(!tabId)
@@ -10,17 +23,50 @@ function tabUpdated(tabId, changeInfo, tab) {
 	if(changeInfo.status != "complete")
 		return;
 	
+	var stringToAppend = getStringToAppend(tab.url);
+	var newTitle = tab.title + stringToAppend;
+	
 	chrome.tabs.executeScript(
 		tabId, 
 		{
-			code: "document.title = '" + tab.title + " - Website!" + "'"
+			code: "document.title = '" + tab.title + stringToAppend + "'"
+		}
+	);
+}
+function getStringToAppend(currentURL) {
+	if(!currentURL)
+		return "";
+	if(!LocalSettings)
+		return "";
+	
+	var urlObject = new URL(currentURL);
+	var domainKey = urlObject.hostname;
+	if(!domainKey)
+		return "";
+	
+	if(domainKey in LocalSettings)
+		return LocalSettings[domainKey];
+	
+	return "";
+}
+
+function storageChanged() {
+	chrome.storage.sync.get(
+		[
+			ATT_Settings
+		],
+		function(items) {
+			LocalSettings = items[ATT_Settings];
 		}
 	);
 }
 
 
+startup();
+
 
 chrome.tabs.onUpdated.addListener(tabUpdated);
+chrome.storage.onChanged.addListener(storageChanged);
 
 
 
