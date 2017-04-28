@@ -1,18 +1,30 @@
 ﻿
+function loadOptions() {
+	chrome.storage.sync.get(
+		[
+			ATT_Settings
+		],
+		function(items) {
+			var settings = items[ATT_Settings];
+			buildSettingsTable(settings):
+		}
+	);
+}
+function buildSettingsTable(settings) {
+	// Loop over all settings and build a row for each domain / string combo.
+	// For ... in ...
+		// addSettingsRow();
+}
+function addSettingsRow(domain = "", stringToAppend = "") {
+	
+}
+
 function saveOptions() {
-	var customURL;
-	
-	var noFocusPinnedTab = document.getElementById("NoFocusPinnedTab").checked;
-	
-	var pinnedTabPage = document.querySelector("input[name=PinnedTabPage]:checked").value;
-	if(pinnedTabPage == PinnedTabPage_Custom)
-		customURL = document.querySelector("#customURL").value;
+	var settings = parseSettingsTable();
 	
 	chrome.storage.sync.set(
 		{
-			[KOPT_NoFocusTab]: noFocusPinnedTab,
-			[KOPT_Page]:       pinnedTabPage,
-			[KOPT_CustomURL]:  customURL
+			[ATT_Settings]: settings
 		}
 	);
 	
@@ -25,33 +37,23 @@ function saveOptions() {
 		750
 	);
 }
-function loadOptions() {
-	chrome.storage.sync.get(
-		[
-			KOPT_NoFocusTab,
-			KOPT_Page,
-			KOPT_CustomURL,
-		],
-		function(items) {
-			var noFocusPinnedTab = items[KOPT_NoFocusTab]
-			var pinnedTabPage    = items[KOPT_Page];
-			var customURL        = items[KOPT_CustomURL];
-			
-			document.getElementById("NoFocusPinnedTab").checked = noFocusPinnedTab;
-			
-			if(!pinnedTabPage) // Default if not set
-				pinnedTabPage = PinnedTabPage_Default;
-			var optionElement = document.querySelector(".PinnedTabPage[value=" + pinnedTabPage + "]");
-			if(optionElement)
-				optionElement.checked = true;
-			
-			if(pinnedTabPage == PinnedTabPage_Custom)
-				document.getElementById("customURL").value = customURL;
-			
-			updateCustomWarning(pinnedTabPage);
-		}
-	);
+function parseSettingsTable() {
+	var settings = [];
+	var domain;
+	var stringToAppend;
+	
+	// Loop over all rows in table and grab the domain / string combos.
+	// For ... in ...
+		// domain = getSettingsRowDomain(row);
+		// stringToAppend = getSettingsRowString(row);
+		// if(!domain || !stringToAppend)
+				// Break (or Continue, or whatever)
+		// settings[domain] = stringToAppend;
+	
+	return settings;
 }
+
+
 
 function updateCustomWarningEvent(e) {
 	updateCustomWarning(e.target.value);
