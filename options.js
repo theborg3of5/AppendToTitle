@@ -7,8 +7,6 @@ function loadOptions() {
 		function(items) {
 			var settings = items[ATT_Settings];
 			buildSettingsTable(settings);
-			
-			alert(settings["stackoverflow.com"]);
 		}
 	);
 }
