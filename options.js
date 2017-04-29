@@ -11,16 +11,24 @@ function loadOptions() {
 	);
 }
 function buildSettingsTable(settings) {
+	var domain, stringToAppend;
+	
 	// Loop over all settings and build a row for each domain / string combo.
-	// For ... in ...
-		// addSettingsRow();
+	for(var i = 0; i < settings.length; i++) {
+		domain         = settings[i].domain;
+		stringToAppend = settings[i].stringToAppend;
+		
+		// alert("Domain: " + domain + "\nAppend: " + stringToAppend);
+		addSettingsRow(domain, stringToAppend);
+	}
+	
 }
 function addSettingsRow(domain = "", stringToAppend = "") {
 	
 }
 
 function saveOptions() {
-	var settings = parseSettingsTable();
+	var settings = readSettingsTable();
 	
 	chrome.storage.sync.set(
 		{
@@ -37,12 +45,15 @@ function saveOptions() {
 		750
 	);
 }
-function parseSettingsTable() {
-	var settings = {};
-	var domain;
-	var stringToAppend;
+function readSettingsTable() {
+	var settings = [];
 	
-	settings["stackoverflow.com"] = " - Website!";
+	settings.push(
+		{
+			domain:         "stackoverflow.com",
+			stringToAppend: " - Website!"
+		}
+	);
 	
 	// Loop over all rows in table and grab the domain / string combos.
 	// For ... in ...

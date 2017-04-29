@@ -2,11 +2,9 @@
 var LocalSettings = [];
 
 
-function startup() {
+function updateLocalSettings() {
 	chrome.storage.sync.get(
-		[
-			ATT_Settings
-		],
+		ATT_Settings,
 		function(items) {
 			LocalSettings = items[ATT_Settings];
 		}
@@ -46,23 +44,13 @@ function getStringToAppend(currentURL) {
 	return "";
 }
 
-function storageChanged() {
-	chrome.storage.sync.get(
-		[
-			ATT_Settings
-		],
-		function(items) {
-			LocalSettings = items[ATT_Settings];
-		}
-	);
-}
+
+updateLocalSettings();
 
 
-startup();
-
-
+chrome.storage.onChanged.addListener(updateLocalSettings);
 chrome.tabs.onUpdated.addListener(tabUpdated);
-chrome.storage.onChanged.addListener(storageChanged);
+
 
 
 
