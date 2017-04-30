@@ -11,20 +11,78 @@ function loadOptions() {
 	);
 }
 function buildSettingsTable(settings) {
-	var domain, stringToAppend;
+	var domain, suffix;
 	
 	// Loop over all settings and build a row for each domain / string combo.
 	for(var i = 0; i < settings.length; i++) {
 		domain         = settings[i].domain;
-		stringToAppend = settings[i].stringToAppend;
+		suffix = settings[i].suffix;
 		
-		// alert("Domain: " + domain + "\nAppend: " + stringToAppend);
-		addSettingsRow(domain, stringToAppend);
+		// alert("Domain: " + domain + "\nAppend: " + suffix);
+		addSettingsRow(domain, suffix);
 	}
 	
 }
-function addSettingsRow(domain = "", stringToAppend = "") {
+function addSettingsRow(domain = "", suffix = "") {
 	
+	var settingsTable = document.getElementById("settingsTable");
+	if(!settingsTable)
+		return;
+	
+	var newRow = settingsTable.insertRow(-1); // -1 - add to end of table
+	newRow.id = "row" + newRow.rowIndex;
+	
+	createInputCell( newRow, "domain", "domainInput"     + newRow.rowIndex);
+	createInputCell( newRow, "suffix", "suffixInput"     + newRow.rowIndex);
+	createButtonCell(newRow, "delete", "invisibleButton" + newRow.rowIndex); // Also need onClick, image?
+	
+	<tr id='row1'>
+		<td class='domainInput'>
+			<input type='text' id='domainInput1' />
+		</td>
+		<td class='suffixInput'>
+			<input type='text' id='suffixInput1' />
+		</td>
+		<td>
+			<button type='button' class='invisibleButton' onclick='deleteSettingsRow(1);'>
+				<img src='delete.png' alt='Delete' title='Remove this domain and suffix' />
+			</button>
+		</td>
+	</tr>
+}
+
+function createInputCell(parentRow, tdClass = "", inputId = "") {
+	if(!parentRow)
+		return;
+	
+	var newCell = createCell(tdClass);
+	
+	var newInput = document.createElement("input");
+	newInput.type = "text";
+	if(inputId)
+		newInput.id = inputId;
+	
+	// Add newInput to newCell
+}
+function createButtonCell(parentRow, tdClass = "", buttonId = "") {
+	if(!parentRow)
+		return;
+	
+	var newCell = createCell(tdClass);
+	
+	var newInput = document.createElement("input");
+	newInput.type = "text";
+	if(inputId)
+		newInput.id = inputId;
+	
+	// Add newInput to newCell
+}
+function createCell(parentRow, tdClass = "") {
+	var newCell = parentRow.insertCell(0);
+	if(tdClass)
+		newCell.class = tdClass;
+	
+	return newCell;
 }
 
 function saveOptions() {
@@ -50,18 +108,18 @@ function readSettingsTable() {
 	
 	settings.push(
 		{
-			domain:         "stackoverflow.com",
-			stringToAppend: " - Website!"
+			domain: "stackoverflow.com",
+			suffix: " - Website!"
 		}
 	);
 	
 	// Loop over all rows in table and grab the domain / string combos.
 	// For ... in ...
 		// domain = getSettingsRowDomain(row);
-		// stringToAppend = getSettingsRowString(row);
-		// if(!domain || !stringToAppend)
+		// suffix = getSettingsRowString(row);
+		// if(!domain || !suffix)
 				// Break (or Continue, or whatever)
-		// settings[domain] = stringToAppend;
+		// settings[domain] = suffix;
 	
 	return settings;
 }

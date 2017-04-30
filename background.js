@@ -17,17 +17,17 @@ function tabUpdated(tabId, changeInfo, tab) {
 	if(changeInfo.status != "complete")
 		return;
 	
-	var stringToAppend = getStringToAppend(tab.url);
-	var newTitle = tab.title + stringToAppend;
+	var suffix = getSuffix(tab.url);
+	var newTitle = tab.title + suffix;
 	
 	chrome.tabs.executeScript(
 		tabId, 
 		{
-			code: "document.title = '" + tab.title + stringToAppend + "'"
+			code: "document.title = '" + tab.title + suffix + "'"
 		}
 	);
 }
-function getStringToAppend(currentURL) {
+function getSuffix(currentURL) {
 	if(!currentURL)
 		return "";
 	if(!LocalSettings)
