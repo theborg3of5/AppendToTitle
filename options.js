@@ -20,7 +20,6 @@ function buildSettingsTable(settings) {
 		
 		addSettingsRow(domain, suffix);
 	}
-	
 }
 function addSettingsRow(domain = "", suffix = "") {
 	var settingsTable = document.getElementById("settingsTable");
@@ -30,20 +29,20 @@ function addSettingsRow(domain = "", suffix = "") {
 	var newRow = settingsTable.insertRow(-1); // -1 - add to end of table
 	newRow.id = "row" + newRow.rowIndex;
 	
-	createInput(newRow, newRow.rowIndex, "domain", domain);
-	createInput(newRow, newRow.rowIndex, "suffix", suffix);
+	createInput(newRow, "domainInput", domain);
+	createInput(newRow, "suffixInput", suffix);
 	createDeleteButton(newRow, newRow.rowIndex);
 }
-
-function createInput(parentRow, rowIndex, tdClass, value = "") {
+function createInput(parentRow, inputClass = "", value = "") {
 	if(!parentRow)
 		return;
 	
-	var newCell = createCell(parentRow, tdClass);
+	var newCell = parentRow.insertCell(-1);
 	
 	var newInput = document.createElement("input");
 	newInput.type = "text";
-	newInput.id = tdClass + rowIndex;
+	if(inputClass)
+		newInput.className = inputClass;
 	newInput.value = value;
 	
 	newCell.appendChild(newInput);
@@ -52,11 +51,10 @@ function createDeleteButton(parentRow, rowIndex) {
 	if(!parentRow)
 		return;
 	
-	var newCell = createCell(parentRow, "delete");
+	var newCell = parentRow.insertCell(-1);
 	
 	var newButton = document.createElement("button");
 	newButton.type = "button";
-	newButton.id = "deleteButton" + rowIndex;
 	newButton.className = "deleteButton invisibleButton";
 	newButton.addEventListener(
 		"click",
@@ -75,14 +73,6 @@ function createDeleteButton(parentRow, rowIndex) {
 	
 	newCell.appendChild(newButton);
 }
-function createCell(parentRow, tdClass = "") {
-	var newCell = parentRow.insertCell(-1);
-	if(tdClass)
-		newCell.className = tdClass;
-	
-	return newCell;
-}
-
 
 function saveOptions() {
 	var settings = readSettingsTable();
@@ -93,6 +83,29 @@ function saveOptions() {
 		}
 	);
 	
+	flashSaved();
+}
+function readSettingsTable() {
+	var settings = [];
+	
+	// Loop over all rows in table and grab the domain / string combos.
+	var table = document.getElementById("settingsTable");
+	var row, domain, suffix;
+	for(var i = 1; i < table.rows.length; i++) { // Start at 1 to avoid header row.
+		row = table.rows[i];
+		domain = row.cells[DOMAIN].firstElementChild.value;
+		suffix = row.cells[SUFFIX].firstElementChild.value;
+		settings.push(
+			{
+				"domain": domain,
+				"suffix": suffix
+			}
+		);
+	}
+	
+	return settings;
+}
+function flashSaved() {
 	var status = document.getElementById("status");
 	status.innerHTML = "Options Saved.";
 	setTimeout(
@@ -101,26 +114,6 @@ function saveOptions() {
 		},
 		750
 	);
-}
-function readSettingsTable() {
-	var settings = [];
-	
-	settings.push(
-		{
-			domain: "stackoverflow.com",
-			suffix: " - Website!"
-		}
-	);
-	
-	// Loop over all rows in table and grab the domain / string combos.
-	// For ... in ...
-		// domain = getSettingsRowDomain(row);
-		// suffix = getSettingsRowString(row);
-		// if(!domain || !suffix)
-				// Break (or Continue, or whatever)
-		// settings[domain] = suffix;
-	
-	return settings;
 }
 
 

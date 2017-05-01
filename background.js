@@ -18,6 +18,9 @@ function tabUpdated(tabId, changeInfo, tab) {
 		return;
 	
 	var suffix = getSuffix(tab.url);
+	if(!suffix)
+		return;
+	
 	var newTitle = tab.title + suffix;
 	
 	chrome.tabs.executeScript(
@@ -34,12 +37,14 @@ function getSuffix(currentURL) {
 		return "";
 	
 	var urlObject = new URL(currentURL);
-	var domainKey = urlObject.hostname;
-	if(!domainKey)
+	var domain = urlObject.hostname;
+	if(!domain)
 		return "";
 	
-	if(domainKey in LocalSettings)
-		return LocalSettings[domainKey];
+	for(var i = 0; i < LocalSettings.length; i++) {
+		if(LocalSettings[i].domain == domain)
+			return LocalSettings[i].suffix;
+	}
 	
 	return "";
 }
