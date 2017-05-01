@@ -18,13 +18,11 @@ function buildSettingsTable(settings) {
 		domain = settings[i].domain;
 		suffix = settings[i].suffix;
 		
-		// alert("Domain: " + domain + "\nAppend: " + suffix);
 		addSettingsRow(domain, suffix);
 	}
 	
 }
 function addSettingsRow(domain = "", suffix = "") {
-	
 	var settingsTable = document.getElementById("settingsTable");
 	if(!settingsTable)
 		return;
@@ -35,16 +33,6 @@ function addSettingsRow(domain = "", suffix = "") {
 	createInput(newRow, newRow.rowIndex, "domain", domain);
 	createInput(newRow, newRow.rowIndex, "suffix", suffix);
 	createDeleteButton(newRow, newRow.rowIndex);
-}
-function deleteSettingsRow(rowIndex) {
-	if(!rowIndex)
-		return;
-	
-	var settingsTable = document.getElementById("settingsTable");
-	if(!settingsTable)
-		return;
-	
-	settingsTable.deleteRow(rowIndex);
 }
 
 function createInput(parentRow, rowIndex, tdClass, value = "") {
@@ -73,7 +61,9 @@ function createDeleteButton(parentRow, rowIndex) {
 	newButton.addEventListener(
 		"click",
 		function() {
-			deleteSettingsRow(rowIndex);
+			var row = this.parentElement.parentElement;
+			var table = row.parentElement;
+			table.deleteRow(row.rowIndex);
 		}
 	);
 	
