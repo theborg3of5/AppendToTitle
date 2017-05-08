@@ -1,7 +1,6 @@
 ﻿
 var LocalSettings = [];
 
-
 function updateLocalSettings() {
 	chrome.storage.sync.get(
 		ATT_Settings,
@@ -14,19 +13,20 @@ function updateLocalSettings() {
 function tabUpdated(tabId, changeInfo, tab) {
 	if(!tabId)
 		return;
-	if(changeInfo.status != "complete")
+	if(!changeInfo.title)
 		return;
 	
 	var suffix = getSuffix(tab.url);
 	if(!suffix)
 		return;
+	if(changeInfo.title.endsWith(suffix)) // Don't need to do anything if the title already has what we want on the end.
+		return;
 	
-	var newTitle = tab.title + suffix;
-	
+	var newTitle = changeInfo.title + suffix;
 	chrome.tabs.executeScript(
 		tabId, 
 		{
-			code: "document.title = '" + tab.title + suffix + "'"
+			code: "document.title = '" + newTitle + "'"
 		}
 	);
 }
