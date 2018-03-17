@@ -13,20 +13,31 @@ function updateLocalSettings() {
 function tabUpdated(tabId, changeInfo, tab) {
 	if(!tabId)
 		return;
-	if(!changeInfo.title)
-		return;
-	
 	var suffix = getSuffix(tab.url);
 	if(!suffix)
 		return;
-	if(changeInfo.title.endsWith(suffix)) // Don't need to do anything if the title already has what we want on the end.
+	
+	// Title can come either from changeInfo (when the title is changing), or from the document as a whole.
+	var title = changeInfo.title;
+	if(!title)
+		title = document.title;
+	
+	// If the title is or is changing to something that already has the suffix we want, nothing left to do.
+	// Also avoids triggering based on our own title change.
+	if(title && title.endsWith(suffix))
 		return;
 	
-	var newTitle = changeInfo.title + suffix;
+	// If we don't have a title to work with and the request still isn't complete, let it be.
+	// The request completing is our last guaranteed update.
+	if(!title && (changeInfo.status != "complete"))
+		return;
+	
+	// Check in the title updating code too, to make sure that we're not adding it twice (because race conditions).
+	var titleUpdateCode = "if(!document.title.endsWith('" + suffix + "')) document.title = document.title + '" + suffix + "'";
 	chrome.tabs.executeScript(
 		tabId, 
 		{
-			code: "document.title = '" + newTitle + "'"
+			code: titleUpdateCode
 		}
 	);
 }
