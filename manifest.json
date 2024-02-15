@@ -18,5 +18,7 @@
 		"service_worker": "service_worker.js"
 	},
 	"incognito": "split",
-	"options_page": "options.html"
+	"options_ui":  {
+		"page": "options.html"
+	}
 }
