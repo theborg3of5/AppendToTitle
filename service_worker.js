@@ -1,36 +1,41 @@
 ﻿
-// var LocalSettings = [];
-
-// function updateLocalSettings() {
-// 	chrome.storage.sync.get(
-// 		"ATT_Settings",
-// 		function(items) {
-// 			LocalSettings = items["ATT_Settings"];
-// 		}
-// 	);
-// }
-
-async function tabUpdated(tabId, changeInfo, tab)
+/**
+ * Whenever a tab is updated, make sure its title includes a suffix if needed.
+ * https://developer.chrome.com/docs/extensions/reference/api/tabs#event-onUpdated
+ * @param {string} tabId ID of the tab that was updated.
+ * @param {object} changeInfo Object of info about what changed.
+ * @param {Tab} tab Tab object that was updated.
+ */
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) =>
 {
 	if (!tabId)
 		return;
-	var suffix = await getSuffixForURL(tab.url);
-	if (!suffix) // If there's no suffix, nothing to do.
-		return;
-	
+
+	const suffix = await getSuffixForURL(tab.url);
 	if (needToUpdateTitle(changeInfo, tab, suffix))
 	{
 		// Inject a script that changes the tab's title.
 		chrome.scripting.executeScript({
 			target: { tabId },
-			func: updateTitle,
+			func: addTitleSuffix,
 			args: [suffix]
 		});
 	}
-}
+});
 
+/**
+ * Check whether we actually need to update the tab's title with a suffix.
+ * @param {object} changeInfo Object of info about what changed.
+ * @param {Tab} tab Tab object that was updated.
+ * @param {string} suffix Suffix that we want to be on this tab's title.
+ * @returns true/false - do we need to update the title?
+ */
 function needToUpdateTitle(changeInfo, tab, suffix)
 {
+	// If there's no suffix, then there's nothing to add.
+	if (!suffix)
+		return false;
+	
 	// Title can come either from changeInfo (when the title is changing), or from the document as a whole.
 	const title = changeInfo.title ?? tab.title;
 	
@@ -47,8 +52,11 @@ function needToUpdateTitle(changeInfo, tab, suffix)
 	return true;
 }
 
-// gdbdoc call out that this is to be injected into the tab to actually update its title
-function updateTitle(suffix)
+/**
+ * Try to add the given suffix to the page title. This is injected into the page with chrome.scripting.executeScript().
+ * @param {string} suffix The suffix to add to the page (tab) title.
+ */
+function addTitleSuffix(suffix)
 {
 	// Check here too, to make sure that we're not adding it twice (because race conditions).
 	if (document.title.endsWith(suffix))
@@ -56,24 +64,12 @@ function updateTitle(suffix)
 	
 	document.title = document.title + suffix;
 }
-// function getSuffix(currentURL) {
-// 	if(!currentURL)
-// 		return "";
-// 	if(!LocalSettings)
-// 		return "";
-	
-// 	var urlObject = new URL(currentURL);
-// 	var domain = urlObject.hostname;	
-// 	if(!domain)
-// 		return "";
-	
-// 	for(var i = 0; i < LocalSettings.length; i++)
-// 		if(doDomainsMatch(LocalSettings[i].domain, domain))
-// 			return LocalSettings[i].suffix;
-	
-// 	return "";
-// }
 
+/**
+ * Retrieve the suffix (if any) for the given URL from settings.
+ * @param {string} queryURL The URL of the tab we're processing.
+ * @returns The suffix that should be added to that tab's title (if any).
+ */
 async function getSuffixForURL(queryURL)
 {
 	// Extract domain from url
@@ -91,6 +87,12 @@ async function getSuffixForURL(queryURL)
 	return "";
 }
 
+/**
+ * Check whether the two domains match, ignoring "www." prefixes.
+ * @param {string} domain1 First domain to compare
+ * @param {string} domain2 Second domain to compare
+ * @returns true/false - do they match?
+ */
 function doDomainsMatch(domain1, domain2) {
 	// Remove the "www." from both (if it exists) to check equality.
 	if(domain1.substring(0, 4) == "www.")
@@ -102,8 +104,3 @@ function doDomainsMatch(domain1, domain2) {
 }
 
 
-// updateLocalSettings();
-
-
-// chrome.storage.onChanged.addListener(updateLocalSettings);
-chrome.tabs.onUpdated.addListener(tabUpdated);
