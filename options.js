@@ -1,128 +1,101 @@
 ﻿
-function loadOptions() {
-	chrome.storage.sync.get(
-		[
-			"ATT_Settings"
-		],
-		function(items) {
-			var settings = items["ATT_Settings"];
-			buildSettingsTable(settings);
-		}
-	);
-}
-function buildSettingsTable(settings) {
-	var domain, suffix;
+/** Page load - load settings from sync storage and populate the fields with them. */
+document.addEventListener("DOMContentLoaded", async () => {
+	const rows = (await chrome.storage.sync.get("ATT_Settings"))["ATT_Settings"];
 	
 	// Loop over all settings and build a row for each domain / string combo.
-	for(var i = 0; i < settings.length; i++) {
-		domain = settings[i].domain;
-		suffix = settings[i].suffix;
-		
-		addSettingsRow(domain, suffix);
+	for (const row of rows) {
+		addSettingsRow(row.domain, row.suffix);
 	}
-}
+});
+
+/** Save button click - read values from fields and save them to sync storage. */
+document.querySelector("#save").addEventListener("click", () => {
+	// Loop over all rows in table and grab the domain / string combos.
+	const settings = [];
+	const table = document.getElementById("settingsTable");
+	for (const row of table.rows) {
+		// Skip the header row.
+		if (row.rowIndex == 0)
+			continue;
+
+		settings.push({
+			"domain": row.cells[0].firstElementChild.value,
+			"suffix": row.cells[1].firstElementChild.value
+		});
+	}
+
+	// Save settings to sync storage.
+	chrome.storage.sync.set({ ["ATT_Settings"]: settings });
+	
+	// Flash an indicator to let the user know we saved.
+	const status = document.getElementById("divStatus");
+	status.innerHTML = "Options Saved.";
+	setTimeout(() => { status.innerHTML = ""; }, 750);
+});
+
+/** 
+ * Add button click - add a new row. 
+ * We wrap addSettingsRow() so we don't pass it the click event args.
+*/
+document.querySelector("#addButton").addEventListener("click", () => addSettingsRow() );
+
+/**
+ * Add a row to the settings table.
+ * @param {string} domain The domain value
+ * @param {string} suffix The suffix to add for this domain
+ */
 function addSettingsRow(domain = "", suffix = "") {
-	var settingsTable = document.getElementById("settingsTable");
+	const settingsTable = document.getElementById("settingsTable");
 	if(!settingsTable)
 		return;
 	
-	var newRow = settingsTable.insertRow(-1); // -1 - add to end of table
-	newRow.id = "row" + newRow.rowIndex;
-	
-	createInput(newRow, "domainInput", domain);
-	createInput(newRow, "suffixInput", suffix);
-	createDeleteButton(newRow, newRow.rowIndex);
+	const newRow = settingsTable.insertRow(-1); // -1 - end of table
+	addRowInput(newRow, domain);
+	addRowInput(newRow, suffix);
+	addRowDeleteButton(newRow);
 }
-function createInput(parentRow, inputClass = "", value = "") {
+
+/**
+ * Add an input field cell to the given row.
+ * @param {tr object} parentRow Row to add an input cell to.
+ * @param {string} value Value that the field should contain.
+ */
+function addRowInput(parentRow, value = "") {
 	if(!parentRow)
 		return;
 	
-	var newCell = parentRow.insertCell(-1);
-	
-	var newInput = document.createElement("input");
+	const newInput = document.createElement("input");
 	newInput.type = "text";
-	if(inputClass)
-		newInput.className = inputClass;
 	newInput.value = value;
 	
+	const newCell = parentRow.insertCell(-1); // -1 - end of row
 	newCell.appendChild(newInput);
 }
-function createDeleteButton(parentRow, rowIndex) {
+
+/**
+ * Add a delete button cell to the given row.
+ * @param {tr object} parentRow Row to add a delete button cell to.
+ */
+function addRowDeleteButton(parentRow) {
 	if(!parentRow)
 		return;
 	
-	var newCell = parentRow.insertCell(-1);
-	
-	var newButton = document.createElement("button");
+	const newButton = document.createElement("button");
 	newButton.type = "button";
 	newButton.className = "deleteButton invisibleButton";
-	newButton.addEventListener(
-		"click",
-		function() {
-			var row = this.parentElement.parentElement;
-			var table = row.parentElement;
-			table.deleteRow(row.rowIndex);
-		}
-	);
+	newButton.addEventListener("click", function () { // Use function instead of () => {} so I can use 'this' to get the button
+		const row = this.parentElement.parentElement; // 'this' is the button, so its parent/grandparent are td > tr.
+		const table = row.parentElement;
+		table.deleteRow(row.rowIndex);
+	});
 	
-	var newImage = document.createElement("img");
+	const newImage = document.createElement("img");
 	newImage.src = "delete16.png";
 	newImage.alt = "Delete";
-	newImage.title = "Remove this domain and suffix";
+	newImage.title = "Remove this row";
 	newButton.appendChild(newImage);
 	
+	const newCell = parentRow.insertCell(-1); // -1 - end of row
 	newCell.appendChild(newButton);
 }
-
-function saveOptions() {
-	var settings = readSettingsTable();
-	
-	chrome.storage.sync.set(
-		{
-			["ATT_Settings"]: settings
-		}
-	);
-	
-	flashSaved();
-}
-function readSettingsTable() {
-	var settings = [];
-	
-	// Loop over all rows in table and grab the domain / string combos.
-	var table = document.getElementById("settingsTable");
-	var row, domain, suffix;
-	for(var i = 1; i < table.rows.length; i++) { // Start at 1 to avoid header row.
-		row = table.rows[i];
-		domain = row.cells[0].firstElementChild.value;
-		suffix = row.cells[1].firstElementChild.value;
-		settings.push(
-			{
-				"domain": domain,
-				"suffix": suffix
-			}
-		);
-	}
-	
-	return settings;
-}
-function flashSaved() {
-	var status = document.getElementById("status");
-	status.innerHTML = "Options Saved.";
-	setTimeout(
-		function() {
-			status.innerHTML = "";
-		},
-		750
-	);
-}
-
-
-// Add the events to load/save from this page.
-document.addEventListener("DOMContentLoaded", loadOptions);
-document.querySelector("#save").addEventListener("click", saveOptions);
-document.querySelector("#addButton").addEventListener(
-	"click", 
-	function() {
-		addSettingsRow();
-	}
-);
