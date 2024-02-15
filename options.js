@@ -2,10 +2,10 @@
 function loadOptions() {
 	chrome.storage.sync.get(
 		[
-			ATT_Settings
+			"ATT_Settings"
 		],
 		function(items) {
-			var settings = items[ATT_Settings];
+			var settings = items["ATT_Settings"];
 			buildSettingsTable(settings);
 		}
 	);
@@ -79,7 +79,7 @@ function saveOptions() {
 	
 	chrome.storage.sync.set(
 		{
-			[ATT_Settings]: settings
+			["ATT_Settings"]: settings
 		}
 	);
 	
@@ -93,8 +93,8 @@ function readSettingsTable() {
 	var row, domain, suffix;
 	for(var i = 1; i < table.rows.length; i++) { // Start at 1 to avoid header row.
 		row = table.rows[i];
-		domain = row.cells[DOMAIN].firstElementChild.value;
-		suffix = row.cells[SUFFIX].firstElementChild.value;
+		domain = row.cells[0].firstElementChild.value;
+		suffix = row.cells[1].firstElementChild.value;
 		settings.push(
 			{
 				"domain": domain,
